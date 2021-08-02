@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Incremental Game</title>
+    <script>
+        var clicker = {
+            Generics: 0,
+            upgrades: {
+                Generic_machine: {
+                    amount: 0,
+                    cost: 10,
+                    gps: 1,
+                    name: "Field"
+                },
+                Generic_factory: {
+                    amount: 0,
+                    cost: 100,
+                    gps: 10,
+                    name: "Plantation"
+                },
+                Generic_world: {
+                    amount: 0,
+                    cost: 5000,
+                    gps: 100,
+                    name: "Take over Africa"
+                },
+                Generic_Universe: {
+                    amount: 0,
+                    cost: 30000,
+                    gps: 1000,
+                    name: "Breed with the Slaves"
+                }
+            },
+            Acheive: [{ req: "clicker.generics>0", gotten: false, text: "You have one Generic!" }, { req: "clicker.generics>9", gotten: false, text: "You have ten Generics!" }]
+        };
+        function Thing_Clicked(thing) {
+            if (clicker.upgrades[thing].cost <= clicker.Generics) {
+                clicker.Generics -= clicker.upgrades[thing].cost;
+                clicker.upgrades[thing].amount++;
+                clicker.upgrades[thing].cost += Math.round(clicker.upgrades[thing].cost * 0.15)
+                update_upgrades();
+            }
+        }
+        function update_upgrades() {
+            document.querySelector("#upgrades").innerHTML = "";
+            for (i in clicker.upgrades) {
+                document.querySelector("#upgrades").innerHTML += `<br> <button onclick="Thing_Clicked('${i}')">${clicker.upgrades[i].name}</button> You Have ${clicker.upgrades[i].amount}. Cost ${clicker.upgrades[i].cost}`;
+            }
+        }
+        function updatecount() {
+            update_upgrades();
+            setInterval(() => {
+                for (i in clicker.upgrades) {
+                    clicker.Generics += clicker.upgrades[i].amount * clicker.upgrades[i].gps / 20
+                }
+                for(i in clicker.Acheive){
+                    var b = new Function('return '+clicker.Acheive[i].req);
+                    if(b() && !clicker.Acheive[i].gotten){
+                        clicker.Acheive[i].gotten = true;
+                        document.querySelector("#Acheive").innerHTML+=`<br>ACHIEVEMENT UNLOCKED<br>${clicker.Acheive[i].text}`;
+                    }
+                }
+                document.querySelector("#Generics").innerHTML = "You Have " + String(clicker.Generics).split(".")[0] + " Slaves"
+            }, 50);
+        }
+    </script>
+</head>
+
+<body onload="updatecount()">
+    <H1 id="Generics">You Have 0 Slaves</H1>
+    <button onclick="clicker.Generics++">Enslave One Nigger</button>
+    <div id="upgrades">
+
+    </div>
+    <br>
+    <div id="Acheive" style="width: 400px; height:300px; overflow:scroll">
+    </div>
+</body>
